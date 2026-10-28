@@ -3492,9 +3492,11 @@ version = "0.4.1"
 dependencies = [
  "photocraft-automation",
  "photocraft-codecs",
+ "photocraft-doc",
  "photocraft-engine",
  "photocraft-format",
  "photocraft-io",
+ "photocraft-ui-egui",
  "serde_json",
  "tokio",
 ]

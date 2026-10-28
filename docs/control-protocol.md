@@ -389,3 +389,15 @@ and region changes rebuild only the dependent analysis. Display options and the 
 geometry persist in preferences `dialogs["filter.cameraRaw.scope"]`; probes and vectorscope
 visibility reset when the dialog opens. HDR scopes are not implemented. See
 [camera-raw-histogram.md](camera-raw-histogram.md).
+
+## Embedded session (no window)
+
+`photocraft-cli embed --control PORT --control-token-file FILE [--size WxH] [--scale S]
+[--automation-read-root DIR] [--automation-write-root DIR]` runs the whole app with no window, for
+hosts that show PhotoCraft inside their own UI (Creative Suite). The UI runs in an off-screen egui
+context (`crates/ui-egui/src/embedded.rs`) drawn by a CPU rasterizer (`softpaint.rs`, shared with
+LightCraft, VectorCraft and EffectCraft); the canvas uses its CPU path. It serves this protocol on
+`127.0.0.1:PORT` with the same token authentication and automation-workspace confinement as
+`photocraft --control`: `ui.screenshot` returns its frames, `ui.*` input drives it, `engine.execute`
+runs commands, `app.quit` ends it. Nothing appears on the screen and nothing takes focus, on any
+system; no GPU or display server is needed.

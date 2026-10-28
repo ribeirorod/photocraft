@@ -50,6 +50,8 @@ pub mod discard_ui;
 pub mod distort_ui;
 pub mod doc_props_ui;
 pub mod dock;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod embedded;
 pub mod enable_rules;
 pub mod eraser_ui;
 pub mod export_dialog;
@@ -115,6 +117,7 @@ mod sizing;
 pub mod slice_ui;
 pub mod smart_ui;
 pub mod snap_ui;
+pub mod softpaint;
 pub mod state;
 pub mod stroke_constraint;
 pub mod stroke_trail;
@@ -959,6 +962,21 @@ impl PhotocraftApp {
 
 impl eframe::App for PhotocraftApp {
     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.logic_frame(ctx);
+    }
+
+    fn raw_input_hook(&mut self, ctx: &egui::Context, raw_input: &mut egui::RawInput) {
+        self.input_hook(ctx, raw_input);
+    }
+
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        self.ui_frame(ui);
+    }
+}
+
+impl PhotocraftApp {
+    /// One frame's logic (the desktop app's `eframe::App::logic`; also run by windowless hosts).
+    pub fn logic_frame(&mut self, ctx: &egui::Context) {
         i18n::set_current(i18n::Lang::from_pref(&self.session.prefs().interface.language));
         if !self.styled {
             Self::setup_context(ctx, self.ui.theme);
@@ -1028,12 +1046,14 @@ impl eframe::App for PhotocraftApp {
         }
     }
 
-    fn raw_input_hook(&mut self, ctx: &egui::Context, raw_input: &mut egui::RawInput) {
+    /// Input for the next frame (the desktop app's `eframe::App::raw_input_hook`).
+    pub fn input_hook(&mut self, ctx: &egui::Context, raw_input: &mut egui::RawInput) {
         shortcuts::clipboard_keys(ctx, ctx.text_edit_focused() || self.ui.text_edit.is_some(), raw_input);
         raw_input.events.extend(self.take_synthetic_step());
     }
 
-    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+    /// One frame's UI (the desktop app's `eframe::App::ui`; also run by windowless hosts).
+    pub fn ui_frame(&mut self, ui: &mut egui::Ui) {
         let ctx = ui.ctx().clone();
         i18n::set_current(i18n::Lang::from_pref(&self.session.prefs().interface.language));
         // Fonts registered via set_fonts only take effect next frame; named families would panic now.
