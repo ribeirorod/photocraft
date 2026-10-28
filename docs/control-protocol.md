@@ -782,3 +782,15 @@ retain custom collapse settings and Timeline visibility.
 ### Select the layer under the pointer
 
 Assign **Select Layer Under Cursor** in Keyboard Shortcuts to choose the topmost visible, pickable layer beneath the canvas pointer. Empty pixels and points outside the document leave the selection unchanged; dialogs, strokes and brush-resize gestures block it. The command follows zoom, pan, view rotation and horizontal flipping. Agents can invoke `ui.menu.invoke {"id":"layer.selectUnderCursor"}` after moving the screen pointer with `ui.move {"x": ..., "y": ...}`. The command has no default shortcut.
+
+## Embedded session (no window)
+
+`photocraft-cli embed --control PORT --control-token-file FILE [--size WxH] [--scale S]
+[--automation-read-root DIR] [--automation-write-root DIR]` runs the whole app with no window, for
+hosts that show PhotoCraft inside their own UI (Creative Suite). The UI runs in an off-screen egui
+context (`crates/ui-egui/src/embedded.rs`) drawn by a CPU rasterizer (`softpaint.rs`, shared with
+LightCraft, VectorCraft and EffectCraft); the canvas uses its CPU path. It serves this protocol on
+`127.0.0.1:PORT` with the same token authentication and automation-workspace confinement as
+`photocraft --control` (without a root that direction of file access is denied): `ui.screenshot` returns its frames, `ui.*` input drives it, `engine.execute`
+runs commands, `app.quit` ends it. Nothing appears on the screen and nothing takes focus, on any
+system; no GPU or display server is needed.

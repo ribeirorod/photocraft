@@ -29,6 +29,8 @@ pub mod canvas;
 pub mod control;
 pub mod dialogs;
 pub mod dock;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod embedded;
 pub(crate) mod edit_session;
 pub mod file_dialog;
 pub mod file_open;
@@ -53,6 +55,7 @@ pub mod preset_files_ui;
 pub mod proxy;
 pub mod render_path;
 pub mod screenshot;
+pub mod softpaint;
 pub mod state;
 pub mod texel_guard;
 pub mod theme;

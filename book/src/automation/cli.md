@@ -12,6 +12,7 @@
 | `commands` | List command IDs and parameter documentation |
 | `mcp` | Start the MCP server on stdio, optionally bridged to the desktop app |
 | `serve` | Start the JSON-lines headless server on stdio or loopback TCP |
+| `embed` | Run the app as a live session with no window, controlled over loopback TCP (see the control protocol's "Embedded session") |
 
 Use `photocraft-cli --help` (or `photocraft-cli <subcommand> --help`) as the executable source of truth. A typical bounded command run is:
 

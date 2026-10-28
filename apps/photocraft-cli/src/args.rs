@@ -38,6 +38,7 @@ pub(crate) enum Command {
     Commands(CommandsArgs),
     Mcp(McpArgs),
     Serve(ServeArgs),
+    Embed(EmbedArgs),
 }
 
 // How an image is written: shared by `convert`, `run` and `batch`.
@@ -291,6 +292,39 @@ pub(crate) struct ServeArgs {
     pub(crate) control: ControlArgs,
     #[command(flatten)]
     pub(crate) automation: AutomationArgs,
+}
+
+/// Run PhotoCraft as a live session with no window, controlled over 127.0.0.1:<PORT>
+///
+/// For hosts that show PhotoCraft inside their own UI. The UI is drawn off-screen on the CPU and
+/// answers the desktop app's control protocol (docs/control-protocol.md#embedded-session-no-window),
+/// with the same token authentication and automation-root confinement as `photocraft --control`.
+/// `app.quit` ends it.
+#[derive(Args)]
+pub(crate) struct EmbedArgs {
+    /// Listen on 127.0.0.1:<PORT>
+    #[arg(long, value_name = "PORT", value_parser = control_port)]
+    pub(crate) control: u16,
+    /// The session's size in points
+    #[arg(long, value_name = "WxH", default_value = "1440x900", value_parser = embed_size)]
+    pub(crate) size: (f32, f32),
+    /// Pixels per point
+    #[arg(long, value_name = "S", default_value_t = 1.0, value_parser = embed_scale)]
+    pub(crate) scale: f32,
+    #[command(flatten)]
+    pub(crate) control_token: ControlArgs,
+    #[command(flatten)]
+    pub(crate) automation: AutomationArgs,
+}
+
+fn embed_size(s: &str) -> Result<(f32, f32), String> {
+    let (w, h) = s.split_once(['x', 'X']).ok_or("expected WxH, e.g. 1440x900")?;
+    let dim = |v: &str| v.trim().parse::<f32>().ok().filter(|v| (64.0..=8192.0).contains(v)).ok_or("each side must be 64-8192");
+    Ok((dim(w)?, dim(h)?))
+}
+
+fn embed_scale(s: &str) -> Result<f32, String> {
+    s.trim().parse::<f32>().ok().filter(|v| v.is_finite() && *v > 0.0 && *v <= 8.0).ok_or_else(|| "expected a number above 0, up to 8".to_string())
 }
 
 /// Why a value was refused: clap prints it after the flag and its value (exit 2).

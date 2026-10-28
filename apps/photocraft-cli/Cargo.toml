@@ -35,6 +35,7 @@ photocraft-doc = { workspace = true }
 photocraft-engine = { workspace = true }
 photocraft-io = { workspace = true }
 photocraft-raster = { workspace = true }
+photocraft-ui-egui = { workspace = true }
 photocraft-format = { path = "../../crates/format" }
 photocraft-codecs = { workspace = true }
 clap = { workspace = true }

@@ -13,6 +13,7 @@ mod args;
 mod automation;
 mod batch;
 mod document;
+mod embed;
 mod error;
 mod gpu;
 mod output;
@@ -22,6 +23,7 @@ use args::{Command, parse};
 use automation::{commands, mcp, serve};
 use batch::{batch, droplet};
 use document::{convert, info, run_cmds};
+use embed::embed;
 pub(crate) use error::{CliError, Result};
 
 /// The command line's clap definition, for generating shell completions and man pages
@@ -59,6 +61,7 @@ where
         Command::Commands(a) => commands(a, out),
         Command::Mcp(a) => mcp(a, err),
         Command::Serve(a) => serve(a, err),
+        Command::Embed(a) => embed(a, err),
     };
     match result {
         Ok(()) => 0,
